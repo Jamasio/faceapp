@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event";
 import React from "react";
 
 class Signin extends React.Component {
@@ -18,8 +19,22 @@ class Signin extends React.Component {
     }
 
     onSubmitSignIn = () => {
-        console.log(this.state);
-        this.props.onRouteChange('home');
+        const {signInEmail, signInPassword} = this.state;
+        fetch('http://localhost:2999/signin', {
+            method: 'post',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: signInEmail,
+                password: signInPassword
+            })
+        })
+        .then(response => response.json())
+        .then(user => {
+            if (user.id) {
+                this.props.loadUser(user);
+                this.props.onRouteChange('home');
+            }
+        })
     }
 
     render() {
@@ -52,7 +67,10 @@ class Signin extends React.Component {
                         </div>
                         </fieldset>
                         <div className="">
-                        <input className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" type="submit" value="Sign in" onClick={this.onSubmitSignIn} />
+                        <input className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" 
+                            type="submit"  
+                            value="Sign in" 
+                            onClick={this.onSubmitSignIn} />
                         </div>
                         <div className="lh-copy mt3">
                         <p onClick={() => onRouteChange('Register')} className="f6 link dim black db pointer">Register</p>
